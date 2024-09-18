@@ -1,11 +1,18 @@
 import userSchemaModel from "../models/userModel.js";
-import { v4 as uuid } from "uuid";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 export const signup = async (req, res) => {
   const data = req.body;
   console.log(data);
+  const salt = bcrypt.genSaltSync(10);
 
-  const response = await userSchemaModel.create(data);
+  const hashedPassword = bcrypt.hashSync(data.password, salt);
+  const response = await userSchemaModel.create({
+    ...data,
+    password: hashedPassword,
+    role: "CUSTOMER",
+  });
   console.log(response);
 
   res.json({
@@ -32,7 +39,19 @@ export const login = async (req, res) => {
       });
     }
 
-    const token = uuid();
+    const currentTimeInSeconds = Math.floor(new Date().getTime() / 1000);
+    const expiryTimeInSeconds = currentTimeInSeconds + 3600;
+
+    const jwtPayload = {
+      userId: user._id,
+      role: user.role,
+      mobileNo: user.mobileNumber,
+      email: user.email,
+      exp: expiryTimeInSeconds,
+    };
+
+    const token = jwt.sign(jwtPayload, "my_secret_key");
+    // const token = "sdasdfklajsdlkfaj;s";
     const userdata = await userSchemaModel.findByIdAndUpdate(user._id, {
       $set: { token },
     });
