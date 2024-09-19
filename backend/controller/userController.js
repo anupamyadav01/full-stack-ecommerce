@@ -22,6 +22,7 @@ export const signup = async (req, res) => {
 };
 
 export const login = async (req, res) => {
+  // login api called
   // checking if user exists or not
   try {
     const user = await userSchemaModel.findOne({ email: req.body.email });
@@ -32,7 +33,10 @@ export const login = async (req, res) => {
       });
     }
 
-    if (user.password !== req.body.password) {
+    const isPasswordSame = bcrypt.compareSync(req.body.password, user.password);
+    console.log(isPasswordSame);
+
+    if (!isPasswordSame) {
       return res.status(404).json({
         sucess: false,
         message: "Password is incorrect, please enter correct password",
@@ -55,7 +59,7 @@ export const login = async (req, res) => {
     const userdata = await userSchemaModel.findByIdAndUpdate(user._id, {
       $set: { token },
     });
-    console.log("userdata", userdata);
+    // console.log("userdata", userdata);
 
     res.json({
       sucess: true,
