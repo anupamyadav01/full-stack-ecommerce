@@ -4,8 +4,8 @@ import jwt from "jsonwebtoken";
 export const authMiddleware = async (req, res, next) => {
   // const token = req.body.token
   try {
-    const token = req.headers.authorization.split(" ")[1];
-    console.log(token);
+    const token = req?.headers?.authorization?.split(" ")[1];
+    // console.log(token);
 
     // Check if token is provided or not
     if (!token) {
@@ -40,10 +40,15 @@ export const authMiddleware = async (req, res, next) => {
         message: "User not found.",
       });
     }
+    // passing user data from auth middleware to role middleware
+    req.user = checkUserDetails;
+
     // if all checks passed, then we allow the user to access the protected route
     next();
   } catch (error) {
-    res.status(401).json({ success: false, message: "Unauthorized user" });
+    res
+      .status(401)
+      .json({ success: false, message: "Unauthorized user (catch)" });
     return;
   }
 };

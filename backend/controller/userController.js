@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 
 export const signup = async (req, res) => {
   const data = req.body;
-  console.log(data);
+  // console.log(data);
   const salt = bcrypt.genSaltSync(10);
 
   const hashedPassword = bcrypt.hashSync(data.password, salt);
@@ -13,7 +13,7 @@ export const signup = async (req, res) => {
     password: hashedPassword,
     role: "CUSTOMER",
   });
-  console.log(response);
+  // console.log(response);
 
   res.json({
     sucess: true,
@@ -34,7 +34,7 @@ export const login = async (req, res) => {
     }
 
     const isPasswordSame = bcrypt.compareSync(req.body.password, user.password);
-    console.log(isPasswordSame);
+    // console.log(isPasswordSame);
 
     if (!isPasswordSame) {
       return res.status(404).json({
