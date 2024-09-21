@@ -5,6 +5,13 @@ import bcrypt from "bcrypt";
 export const signup = async (req, res) => {
   const data = req.body;
   // console.log(data);
+  const user = await userSchemaModel.findOne({ email: data.email });
+  if (user) {
+    return res.status(409).json({
+      sucess: false,
+      message: "User already exists",
+    });
+  }
   const salt = bcrypt.genSaltSync(10);
 
   const hashedPassword = bcrypt.hashSync(data.password, salt);
@@ -15,7 +22,7 @@ export const signup = async (req, res) => {
   });
   // console.log(response);
 
-  res.json({
+  res.status(201).json({
     sucess: true,
     message: "User registered successfully",
   });
@@ -34,7 +41,6 @@ export const login = async (req, res) => {
     }
 
     const isPasswordSame = bcrypt.compareSync(req.body.password, user.password);
-    // console.log(isPasswordSame);
 
     if (!isPasswordSame) {
       return res.status(404).json({
@@ -61,11 +67,23 @@ export const login = async (req, res) => {
     });
     // console.log("userdata", userdata);
 
-    res.json({
-      sucess: true,
-      message: "Logged in successfully",
-      token: token,
-    });
+    // res.json({
+    //   sucess: true,
+    //   message: "Logged in successfully",
+    //   token: token,
+    // });
+
+    res
+      .cookie("auth_token", token, {
+        httpOnly: true,
+        secure: false, //as we are working with localhost, which runs on http, not on https
+        sameSite: "strict",
+        maxAge: 3600000,
+      })
+      .status(200)
+      .json({
+        message: "Login Successful",
+      });
   } catch (error) {
     console.log("Unable to login user", error);
   }

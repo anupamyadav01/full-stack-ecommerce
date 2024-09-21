@@ -3,12 +3,19 @@ import dotenv from "dotenv";
 import userRoutes from "./routes/userRoutes.js";
 import mongoose from "mongoose";
 import productRoute from "./routes/productRoute.js";
+import cors from "cors";
+import cookieParser from "cookie-parser";
 const app = express();
 
 const port = process.env.PORT || 10000;
 dotenv.config();
-
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 app.use(express.json());
+app.use(cookieParser());
 
 mongoose
   .connect(`${process.env.MONGODB_URL}/${process.env.DB_NAME}`)

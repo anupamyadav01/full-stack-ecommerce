@@ -50,10 +50,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  address: {
-    type: address,
-    required: true,
-  },
+  // address: {
+  //   type: address,
+  //   required: true,
+  // },
   token: {
     type: String,
     required: false,
